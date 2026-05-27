@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-
+import plotly.express as px
 
 @st.cache_data
 def load_data():
@@ -26,7 +26,6 @@ st.header("Analyse de mes activités Strava")
 current_month = pd.Period(pd.Timestamp.now(), "M")
 last_month = current_month - 1
 
-# Données ce mois-ci vs mois dernier
 runs_this_month = len(df[df["month"] == current_month])
 runs_last_month = len(df[df["month"] == last_month])
 distance_this_month = df[df["month"] == current_month]["distance_km"].sum()
@@ -57,6 +56,23 @@ st.divider()
 st.subheader("Statistiques all time")
 
 col1, col2, col3 = st.columns(3)
-col1.metric("Nombres de courses", len(df))
+col1.metric("Nombre de courses", len(df))
 col2.metric("Distance totale (km)", df["distance_km"].sum().round(2))
 col3.metric("Allure moyenne globale (min/km)", format_pace(df["pace_min_km"].mean()))
+
+st.divider()
+st.subheader("Évolution")
+
+df_evolution = df.groupby("month")["pace_min_km"].mean().reset_index()
+df_evolution["month"] = df_evolution["month"].astype(str)  # ← correction clé
+
+fig = px.line(
+    data_frame=df_evolution,
+    x="month",
+    y="pace_min_km",
+    title="Évolution de l'allure moyenne par mois",
+    labels={"month": "Mois", "pace_min_km": "Allure (min/km)"},
+    markers=True
+)
+fig.update_yaxes(autorange="reversed")  # allure plus basse = meilleure = en haut
+st.plotly_chart(fig, use_container_width=True)
