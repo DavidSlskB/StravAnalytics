@@ -127,3 +127,31 @@ fig.update_layout(
 )
 
 st.plotly_chart(fig, use_container_width=True)
+
+st.divider()
+st.subheader("Distance vs Allure")
+
+fig_scatter = px.scatter(
+    data_frame=df,
+    x="distance_km",
+    y="pace_min_km",
+    color="year",
+    hover_data=["name", "date", "distance_km", "pace_min_km"],
+    title="Relation distance / allure par sortie",
+    labels={
+        "distance_km": "Distance (km)",
+        "pace_min_km": "Allure (min/km)",
+        "year": "Année"
+    },
+    color_discrete_sequence=[STRAVA_ORANGE, STRAVA_BLUE, "#A8E063"]
+)
+
+fig_scatter.update_layout(
+    plot_bgcolor=PLOT_BG,
+    paper_bgcolor=PAPER_BG,
+    font=dict(color="white"),
+    xaxis=dict(gridcolor="#3D3D42"),
+    yaxis=dict(gridcolor="#3D3D42"),
+)
+
+st.plotly_chart(fig_scatter, use_container_width=True)
