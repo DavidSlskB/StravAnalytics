@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 
 @st.cache_data
 def load_data():
@@ -63,16 +64,39 @@ col3.metric("Allure moyenne globale (min/km)", format_pace(df["pace_min_km"].mea
 st.divider()
 st.subheader("Évolution")
 
-df_evolution = df.groupby("month")["pace_min_km"].mean().reset_index()
-df_evolution["month"] = df_evolution["month"].astype(str)  # ← correction clé
+df_evolution = df.groupby("month").agg(
+    total_distance=("distance_km", "sum"),
+    mean_distance=("distance_km", "mean"),
+    total_time=("moving_time_seconds", "sum")
+).reset_index()
 
-fig = px.line(
-    data_frame=df_evolution,
-    x="month",
-    y="pace_min_km",
-    title="Évolution de l'allure moyenne par mois",
-    labels={"month": "Mois", "pace_min_km": "Allure (min/km)"},
-    markers=True
+df_evolution["pace_ponderee"] = df_evolution["total_time"] / 60 / df_evolution["total_distance"]
+df_evolution["month"] = df_evolution["month"].astype(str)
+
+fig = go.Figure()
+
+fig.add_trace(go.Scatter(
+    x=df_evolution["month"],
+    y=df_evolution["pace_ponderee"],
+    name="Allure (min/km)",
+    mode="lines+markers",
+    yaxis="y1"
+))
+
+fig.add_trace(go.Scatter(
+    x=df_evolution["month"],
+    y=df_evolution["mean_distance"],
+    name="Distance moyenne (km)",
+    mode="lines+markers",
+    yaxis="y2"
+))
+
+fig.update_layout(
+    title="Évolution de l'allure et de la distance moyenne par mois",
+    xaxis=dict(title="Mois"),
+    yaxis=dict(title="Allure (min/km)"), # autorange="reversed"
+    yaxis2=dict(title="Distance moyenne (km)", overlaying="y", side="right"),
+    legend=dict(x=0, y=1.1, orientation="h")
 )
-fig.update_yaxes(autorange="reversed")  # allure plus basse = meilleure = en haut
+
 st.plotly_chart(fig, use_container_width=True)
