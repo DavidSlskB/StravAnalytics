@@ -75,6 +75,33 @@ df_evolution["month"] = df_evolution["month"].astype(str)
 
 fig = go.Figure()
 
+STRAVA_ORANGE = "#FC4C02"
+STRAVA_BLUE = "#4FC3F7"
+PLOT_BG = "#2D2D32"
+PAPER_BG = "#242428"
+
+fig.update_layout(
+    title="Évolution de l'allure et de la distance moyenne par mois",
+    xaxis=dict(title="Mois", gridcolor="#3D3D42"),
+    yaxis=dict(title="Allure (min/km)", gridcolor="#3D3D42"),
+    yaxis2=dict(title="Distance moyenne (km)", overlaying="y", side="right"),
+    legend=dict(x=0, y=1.1, orientation="h"),
+    plot_bgcolor=PLOT_BG,
+    paper_bgcolor=PAPER_BG,
+    font=dict(color="white")
+)
+
+fig.update_traces(
+    selector=dict(name="Allure (min/km)"),
+    line=dict(color=STRAVA_ORANGE),
+    marker=dict(color=STRAVA_ORANGE)
+)
+fig.update_traces(
+    selector=dict(name="Distance moyenne (km)"),
+    line=dict(color=STRAVA_BLUE),
+    marker=dict(color=STRAVA_BLUE)
+)
+
 fig.add_trace(go.Scatter(
     x=df_evolution["month"],
     y=df_evolution["pace_ponderee"],
