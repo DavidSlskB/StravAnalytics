@@ -39,3 +39,40 @@ fig_hist.update_layout(
     bargap=0.1
 )
 st.plotly_chart(fig_hist, use_container_width=True)
+
+# ── Allure par tranche de distance ──
+st.subheader("Allure pondérée par tranche de distance")
+
+bins   = [0, 4, 6, 9, 13, 50]
+labels = ["0-4km", "4-6km", "6-9km", "9-13km", "13km+"]
+df["tranche"] = pd.cut(df["distance_km"], bins=bins, labels=labels)
+
+df_tranches = df.groupby("tranche", observed=True).agg(
+    total_distance=("distance_km", "sum"),
+    total_time=("moving_time_seconds", "sum"),
+    nb_sorties=("id", "count")
+).reset_index()
+
+df_tranches["pace_ponderee"] = df_tranches["total_time"] / 60 / df_tranches["total_distance"]
+
+fig_bar = px.bar(
+    df_tranches,
+    x="tranche",
+    y="pace_ponderee",
+    text="nb_sorties",
+    title="Allure pondérée par tranche de distance",
+    labels={
+        "tranche": "Tranche de distance",
+        "pace_ponderee": "Allure (min/km)",
+    },
+    color_discrete_sequence=[STRAVA_ORANGE]
+)
+fig_bar.update_traces(texttemplate="%{text} sorties", textposition="outside")
+fig_bar.update_layout(
+    plot_bgcolor=PLOT_BG,
+    paper_bgcolor=PAPER_BG,
+    font=dict(color="white"),
+    xaxis=dict(gridcolor="#3D3D42"),
+    yaxis=dict(gridcolor="#3D3D42"),
+)
+st.plotly_chart(fig_bar, use_container_width=True)
