@@ -14,22 +14,24 @@ pip install -r requirements.txt
 2. Copy `.env.example` to `.env` and fill in your credentials
 3. Run `python src/auth.py` to authenticate
 4. Run `python src/fetch.py` to fetch your activities
-5. Run `streamlit run streamlit_app/app.py` to launch the dashboard
+5. Open `notebooks/01_exploration.ipynb` and run all cells to generate cleaned datasets
+6. Run `streamlit run streamlit_app/app.py` to launch the dashboard
 
 ## Project structure
 ```bash
 StravAnalytics/
 ├── src/
-│   ├── auth.py          # Strava OAuth authentication
-│   └── fetch.py         # Fetch and save activities
+│   ├── auth.py               # Strava OAuth authentication
+│   └── fetch.py              # Fetch and save activities
 ├── notebooks/
-│   └── 01_exploration.ipynb  # Data cleaning and EDA
+│   └── 01_exploration.ipynb  # Data cleaning and feature engineering
 ├── streamlit_app/
-│   ├── app.py           # Main dashboard page
+│   ├── app.py                # Main dashboard page
+│   ├── utils.py              # Shared functions and constants
 │   └── pages/
-│       ├── 2_Distances.py
-│       └── 3_Map.py
-└── data/                # Local only, not versioned
+│       ├── 2_Distances.py    # Distance analysis and clustering
+│       └── 3_Map.py          # GPS map visualization
+└── data/                     # Local only, not versioned
 ```
 
 ## Roadmap
@@ -37,4 +39,5 @@ StravAnalytics/
 - [ ] Données de flux par activité (splits, PR sur sous-distances)
 - [ ] Modèle ML de prédiction du suffer score
 - [ ] Déploiement Streamlit Cloud
-- [ ] Enrichissement météo via API Open-Meteo (température, conditions) pour affiner le clustering
+- [ ] Enrichissement météo via API Open-Meteo pour affiner le clustering
+- [ ] Page détail par sortie (tracé GPS, stats complètes, comparaison avec sorties similaires)
