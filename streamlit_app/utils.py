@@ -8,9 +8,10 @@ PLOT_BG       = "#2D2D32"
 PAPER_BG      = "#242428"
 
 @st.cache_data
-def load_data():
-    df = pd.read_csv("data/activities_clean.csv")
-    df["month"] = df["month"].astype("period[M]")
+def load_data(path="data/activities_clean.csv"):
+    df = pd.read_csv(path)
+    if "month" in df.columns:
+        df["month"] = df["month"].astype("period[M]")
     return df
 
 def format_pace(pace_decimal):
