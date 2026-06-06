@@ -41,3 +41,4 @@ StravAnalytics/
 - [ ] Déploiement Streamlit Cloud
 - [ ] Enrichissement météo via API Open-Meteo pour affiner le clustering
 - [ ] Page détail par sortie (tracé GPS, stats complètes, comparaison avec sorties similaires)
+- [ ] Récupération des détails complets par activité (description, splits) via get_activity()
