@@ -2,18 +2,12 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
 
-# ── Constantes couleurs Strava ──
-STRAVA_ORANGE = "#FC4C02"
-STRAVA_BLUE = "#4FC3F7"
-PLOT_BG = "#2D2D32"
-PAPER_BG = "#242428"
+from utils import format_pace, load_data, STRAVA_ORANGE, STRAVA_BLUE, PLOT_BG, PAPER_BG
 
-@st.cache_data
-def load_data():
-    df = pd.read_csv("data/activities_clean.csv")
-    df["month"] = df["month"].astype("period[M]")
-    return df
 
 df = load_data()
 
@@ -78,13 +72,62 @@ fig_bar.update_layout(
 st.plotly_chart(fig_bar, use_container_width=True)
 
 
-# ── K ──
-st.subheader("K-means")
+st.divider()
+st.subheader("Clustering K-Means")
 
-from sklearn.preprocessing import StandardScaler
-from sklearn.cluster import KMeans
+df_features = df[["distance_km", "pace_min_km"]]
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(df_features)
 
-# Extraire les features distance_km et pace_min_km
-# Appliquer StandardScaler
-# Boucler sur K de 1 à 10, entraîner un KMeans à chaque fois et récupérer son inertie (kmeans.inertia_)
-# Tracer la courbe inertie vs K
+# Détermination automatique du meilleur K
+silhouette_scores = []
+for k in range(2, 11):
+    kmeans = KMeans(n_clusters=k, random_state=0, n_init="auto")
+    labels = kmeans.fit_predict(X_scaled)
+    silhouette_scores.append(silhouette_score(X_scaled, labels))
+
+# best_k = silhouette_scores.index(max(silhouette_scores)) + 2
+best_k = 3 # Choix métier : 3 types d'entraînement naturels
+
+# Entraînement final avec le meilleur K
+kmeans_final = KMeans(n_clusters=best_k, random_state=0, n_init="auto")
+df["cluster"] = kmeans_final.fit_predict(X_scaled)
+df["cluster"] = df["cluster"].astype(str)
+
+st.info(f"Meilleur K selon le score de silhouette : **{best_k}**")
+
+# Visualisation des clusters
+fig_clusters = px.scatter(
+    df,
+    x="distance_km",
+    y="pace_min_km",
+    color="cluster",
+    hover_data=["name", "date"],
+    title=f"Clustering de tes sorties ({best_k} groupes)",
+    labels={
+        "distance_km": "Distance (km)",
+        "pace_min_km": "Allure (min/km)",
+        "cluster": "Cluster"
+    },
+    color_discrete_sequence=[STRAVA_ORANGE, STRAVA_BLUE, "#A8E063", "#E040FB"]
+)
+fig_clusters.update_layout(
+    plot_bgcolor=PLOT_BG,
+    paper_bgcolor=PAPER_BG,
+    font=dict(color="white"),
+    xaxis=dict(gridcolor="#3D3D42"),
+    yaxis=dict(gridcolor="#3D3D42"),
+)
+st.plotly_chart(fig_clusters, use_container_width=True)
+
+# Caractéristiques de chaque cluster
+st.subheader("Caractéristiques des clusters")
+df_cluster_stats = df.groupby("cluster").agg(
+    nb_sorties=("id", "count"),
+    distance_moyenne=("distance_km", "mean"),
+    allure_moyenne=("pace_min_km", "mean")
+).reset_index()
+df_cluster_stats["distance_moyenne"] = df_cluster_stats["distance_moyenne"].round(1)
+df_cluster_stats["allure_moyenne"]   = df_cluster_stats["allure_moyenne"].apply(format_pace)
+df_cluster_stats.columns = ["Cluster", "Nb sorties", "Distance moy. (km)", "Allure moy."]
+st.dataframe(df_cluster_stats, use_container_width=True, hide_index=True)

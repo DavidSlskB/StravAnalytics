@@ -3,21 +3,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
-@st.cache_data
-def load_data():
-    df = pd.read_csv("data/activities_clean.csv")
-    df["month"] = df["month"].astype("period[M]")
-    return df
-
-
-def format_pace(pace_decimal):
-    if pd.isna(pace_decimal):
-        return "N/A"
-    negative = pace_decimal < 0
-    pace_decimal = abs(pace_decimal)
-    minutes = int(pace_decimal)
-    seconds = round((pace_decimal - minutes) * 60)
-    return f"-{minutes}:{seconds:02d}" if negative else f"{minutes}:{seconds:02d}"
+from utils import format_pace, load_data, STRAVA_ORANGE, STRAVA_BLUE, PLOT_BG, PAPER_BG
 
 df = load_data()
 
@@ -74,11 +60,6 @@ df_evolution["pace_ponderee"] = df_evolution["total_time"] / 60 / df_evolution["
 df_evolution["month"] = df_evolution["month"].astype(str)
 
 fig = go.Figure()
-
-STRAVA_ORANGE = "#FC4C02"
-STRAVA_BLUE = "#4FC3F7"
-PLOT_BG = "#2D2D32"
-PAPER_BG = "#242428"
 
 fig.update_layout(
     title="Évolution de l'allure et de la distance moyenne par mois",
