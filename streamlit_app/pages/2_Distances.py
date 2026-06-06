@@ -76,3 +76,15 @@ fig_bar.update_layout(
     yaxis=dict(gridcolor="#3D3D42"),
 )
 st.plotly_chart(fig_bar, use_container_width=True)
+
+
+# ── K ──
+st.subheader("K-means")
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+
+# Extraire les features distance_km et pace_min_km
+# Appliquer StandardScaler
+# Boucler sur K de 1 à 10, entraîner un KMeans à chaque fois et récupérer son inertie (kmeans.inertia_)
+# Tracer la courbe inertie vs K

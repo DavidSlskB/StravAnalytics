@@ -37,3 +37,4 @@ StravAnalytics/
 - [ ] Données de flux par activité (splits, PR sur sous-distances)
 - [ ] Modèle ML de prédiction du suffer score
 - [ ] Déploiement Streamlit Cloud
+- [ ] Enrichissement météo via API Open-Meteo (température, conditions) pour affiner le clustering
