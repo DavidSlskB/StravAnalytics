@@ -40,7 +40,7 @@ df_filtered = df[
 
 # ── Tableau affiché ──
 df_table = df_filtered[[
-    "id", "name", "day_of_week", "date_fr", "hour",
+    "id", "name", "day_of_week", "date_fr", "hour", "hour_fr",
     "distance_km", "pace_min_km", "moving_time_minutes",
     "total_elevation_gain_m", "suffer_score"
 ]].copy()
@@ -48,10 +48,23 @@ df_table = df_filtered[[
 st.title("🏃 Liste de mes sorties")
 st.caption(f"{len(df_table)} sortie(s) affichée(s)")
 
-st.dataframe(
+df_table["label"] = (df_table["name"] + "  -  le " + df_table["date_fr"] + " à " + df_table["hour_fr"])
+
+selected_label = st.selectbox(
+    "Voir le détail d'une sortie :",
+    df_table["label"].tolist()
+)
+if st.button("Voir →"):
+    activity_id = df_table[df_table["label"] == selected_label]["id"].iloc[0]
+    st.session_state["selected_activity_id"] = int(activity_id)
+    st.switch_page("pages/5_Activity.py")
+
+selection = st.dataframe(
     df_table.drop(columns=["id"]),
     use_container_width=True,
     hide_index=True,
+    on_select="rerun",
+    selection_mode="single-row",
     column_config={
         "name":                   st.column_config.TextColumn("Sortie"),
         "day_of_week":            st.column_config.TextColumn("Jour"),
@@ -64,3 +77,9 @@ st.dataframe(
         "suffer_score":           st.column_config.NumberColumn("Suffer score", format="%.0f"),
     }
 )
+
+if selection["selection"]["rows"]:
+    selected_idx = selection["selection"]["rows"][0]
+    activity_id = df_table.iloc[selected_idx]["id"]
+    st.session_state["selected_activity_id"] = int(activity_id)
+    st.switch_page("pages/5_Activity.py")
