@@ -38,10 +38,32 @@ StravAnalytics/
 ```
 
 ## Roadmap
-- [ ] Internationalisation (FR/EN)
+
+### ✅ V1.0.0 — Terminé
+- [x] Pipeline de collecte via API Strava (OAuth2, fetch, refresh token)
+- [x] Nettoyage et feature engineering (notebook)
+- [x] Dashboard Streamlit - Vue générale (métriques, évolution, scatter)
+- [x] Dashboard Streamlit - Analyse par distance (histogramme, clustering K-Means)
+- [x] Dashboard Streamlit - Carte GPS interactive (zones auto-détectées, géocodage)
+- [x] Dashboard Streamlit - Liste des activités (filtres, navigation)
+- [x] Dashboard Streamlit - Page détail par sortie (tracé GPS, stats)
+- [x] Déploiement Streamlit Cloud
+
+### Court terme
+- [ ] Automatisation du fetch et push des données (scheduler)
+- [ ] Enrichissement météo via API Open-Meteo
+- [ ] Visualisations temporelles : répartition par heure, jour, saison
+- [ ] Amélioration clustering : ajout features météo, temporelles
+
+### Moyen terme
 - [ ] Données de flux par activité (splits, PR sur sous-distances)
+- [ ] Amélioration page détail (description, splits via get_activity())
 - [ ] Modèle ML de prédiction du suffer score
-- [ ] Déploiement Streamlit Cloud
-- [ ] Enrichissement météo via API Open-Meteo pour affiner le clustering
-- [ ] Page détail par sortie (tracé GPS, stats complètes, comparaison avec sorties similaires)
-- [ ] Récupération des détails complets par activité (description, splits) via get_activity()
+- [ ] Courbes de progression avec projection future
+- [ ] Score de forme sur les 4 dernières semaines basé sur le volume et l'allure
+
+### Long terme
+- [ ] Commentaire IA sur la situation actuelle (LLM)
+- [ ] Internationalisation (FR/EN)
+- [ ] Multi-utilisateurs (authentification, token personnalisé)
+- [ ] Suggestions de sorties types pour la prochaine course
