@@ -14,7 +14,7 @@ activity_id = st.session_state.get("selected_activity_id")
 if activity_id is None:
     st.warning("Aucune sortie sélectionnée — retourne à la liste.")
     if st.button("← Retour à la liste"):
-        st.switch_page("pages/4_Activities.py")
+        st.switch_page("pages/4_Activités.py")
     st.stop()
 
 activity     = df[df["id"] == activity_id].iloc[0]
@@ -24,7 +24,7 @@ activity_map = df_map[df_map["id"] == activity_id].iloc[0] if activity_id in df_
 col_back, col_title = st.columns([1, 8])
 with col_back:
     if st.button("←"):
-        st.switch_page("pages/4_Activities.py")
+        st.switch_page("pages/4_Activités.py")
 with col_title:
     st.title(activity["name"])
     st.caption(f"{activity['day_of_week']} {activity['date_fr']} à {activity['hour_fr']}")
