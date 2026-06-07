@@ -32,8 +32,11 @@ StravAnalytics/
 │   ├── app.py                # Main dashboard page
 │   ├── utils.py              # Shared functions and constants
 │   └── pages/
-│       ├── 2_Distances.py    # Distance analysis and clustering
-│       └── 3_Map.py          # GPS map visualization
+        ├── 1_Vue_générale.py # Overview, metrics, charts
+        ├── 2_Distances.py    # Distance analysis and K-Means clustering
+        ├── 3_Carte.py        # Interactive GPS map
+        ├── 4_Activités.py    # Activities list with filters
+        └── 5_Détail.py       # Single activity detail
 └── data/                     # Local only, not versioned
 ```
 
