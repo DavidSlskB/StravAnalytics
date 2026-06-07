@@ -57,7 +57,7 @@ selected_label = st.selectbox(
 if st.button("Voir →"):
     activity_id = df_table[df_table["label"] == selected_label]["id"].iloc[0]
     st.session_state["selected_activity_id"] = int(activity_id)
-    st.switch_page("pages/5_Activity.py")
+    st.switch_page("pages/5_Détail.py")
 
 selection = st.dataframe(
     df_table.drop(columns=["id"]),
@@ -82,4 +82,4 @@ if selection["selection"]["rows"]:
     selected_idx = selection["selection"]["rows"][0]
     activity_id = df_table.iloc[selected_idx]["id"]
     st.session_state["selected_activity_id"] = int(activity_id)
-    st.switch_page("pages/5_Activity.py")
+    st.switch_page("pages/5_Détail.py")

@@ -1,0 +1,138 @@
+import streamlit as st
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+
+from utils import format_pace, load_data, STRAVA_ORANGE, STRAVA_BLUE, PLOT_BG, PAPER_BG
+
+df = load_data()
+
+st.title("StravAnalytics 🏃")
+st.header("Analyse de mes activités Strava")
+
+current_month = pd.Period(pd.Timestamp.now(), "M")
+last_month = current_month - 1
+
+runs_this_month = len(df[df["month"] == current_month])
+runs_last_month = len(df[df["month"] == last_month])
+distance_this_month = df[df["month"] == current_month]["distance_km"].sum()
+distance_last_month = df[df["month"] == last_month]["distance_km"].sum()
+pace_this_month = df[df["month"] == current_month]["pace_min_km"].mean()
+pace_last_month = df[df["month"] == last_month]["pace_min_km"].mean()
+
+col1, col2, col3 = st.columns(3)
+
+col1.metric(
+    label="Courses ce mois",
+    value=runs_this_month,
+    delta=f"{runs_this_month - runs_last_month:+d} vs mois dernier"
+)
+col2.metric(
+    label="Distance ce mois (km)",
+    value=f"{distance_this_month:.1f}",
+    delta=f"{distance_this_month - distance_last_month:+.1f} vs mois dernier"
+)
+col3.metric(
+    label="Allure ce mois (min/km)",
+    value=format_pace(pace_this_month),
+    delta=format_pace(pace_this_month - pace_last_month) + " vs mois dernier",
+    delta_color="inverse"
+)
+
+st.divider()
+st.subheader("Statistiques all time")
+
+col1, col2, col3 = st.columns(3)
+col1.metric("Nombre de courses", len(df))
+col2.metric("Distance totale (km)", df["distance_km"].sum().round(2))
+col3.metric("Allure moyenne globale (min/km)", format_pace(df["pace_min_km"].mean()))
+
+st.divider()
+st.subheader("Évolution")
+
+df_evolution = df.groupby("month").agg(
+    total_distance=("distance_km", "sum"),
+    mean_distance=("distance_km", "mean"),
+    total_time=("moving_time_seconds", "sum")
+).reset_index()
+
+df_evolution["pace_ponderee"] = df_evolution["total_time"] / 60 / df_evolution["total_distance"]
+df_evolution["month"] = df_evolution["month"].astype(str)
+
+fig = go.Figure()
+
+fig.update_layout(
+    title="Évolution de l'allure et de la distance moyenne par mois",
+    xaxis=dict(title="Mois", gridcolor="#3D3D42"),
+    yaxis=dict(title="Allure (min/km)", gridcolor="#3D3D42"),
+    yaxis2=dict(title="Distance moyenne (km)", overlaying="y", side="right"),
+    legend=dict(x=0, y=1.1, orientation="h"),
+    plot_bgcolor=PLOT_BG,
+    paper_bgcolor=PAPER_BG,
+    font=dict(color="white")
+)
+
+fig.update_traces(
+    selector=dict(name="Allure (min/km)"),
+    line=dict(color=STRAVA_ORANGE),
+    marker=dict(color=STRAVA_ORANGE)
+)
+fig.update_traces(
+    selector=dict(name="Distance moyenne (km)"),
+    line=dict(color=STRAVA_BLUE),
+    marker=dict(color=STRAVA_BLUE)
+)
+
+fig.add_trace(go.Scatter(
+    x=df_evolution["month"],
+    y=df_evolution["pace_ponderee"],
+    name="Allure (min/km)",
+    mode="lines+markers",
+    yaxis="y1"
+))
+
+fig.add_trace(go.Scatter(
+    x=df_evolution["month"],
+    y=df_evolution["mean_distance"],
+    name="Distance moyenne (km)",
+    mode="lines+markers",
+    yaxis="y2"
+))
+
+fig.update_layout(
+    title="Évolution de l'allure et de la distance moyenne par mois",
+    xaxis=dict(title="Mois"),
+    yaxis=dict(title="Allure (min/km)"), # autorange="reversed"
+    yaxis2=dict(title="Distance moyenne (km)", overlaying="y", side="right"),
+    legend=dict(x=0, y=1.1, orientation="h")
+)
+
+st.plotly_chart(fig, use_container_width=True)
+
+st.divider()
+st.subheader("Distance vs Allure")
+
+fig_scatter = px.scatter(
+    data_frame=df,
+    x="distance_km",
+    y="pace_min_km",
+    color="year",
+    hover_data=["name", "date", "distance_km", "pace_min_km"],
+    title="Relation distance / allure par sortie",
+    labels={
+        "distance_km": "Distance (km)",
+        "pace_min_km": "Allure (min/km)",
+        "year": "Année"
+    },
+    color_discrete_sequence=[STRAVA_ORANGE, STRAVA_BLUE, "#A8E063"]
+)
+
+fig_scatter.update_layout(
+    plot_bgcolor=PLOT_BG,
+    paper_bgcolor=PAPER_BG,
+    font=dict(color="white"),
+    xaxis=dict(gridcolor="#3D3D42"),
+    yaxis=dict(gridcolor="#3D3D42"),
+)
+
+st.plotly_chart(fig_scatter, use_container_width=True)

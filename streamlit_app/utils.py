@@ -8,7 +8,7 @@ STRAVA_BLUE   = "#4FC3F7"
 PLOT_BG       = "#2D2D32"
 PAPER_BG      = "#242428"
 
-@st.cache_data
+@st.cache_data(ttl=3600)  # expire après 1 heure
 def load_data(path="data/activities_clean.csv"):
     df = pd.read_csv(path)
     if "month" in df.columns:

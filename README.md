@@ -1,6 +1,9 @@
 # StravAnalytics
 Personal running data analysis dashboard using Strava API.
 
+## Live demo
+👉 [stravanalytics.streamlit.app](https://stravanalytics.streamlit.app)
+
 ## Setup
 ```bash
 python -m venv .venv
