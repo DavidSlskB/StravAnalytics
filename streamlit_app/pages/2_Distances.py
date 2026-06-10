@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 from sklearn.preprocessing import StandardScaler
@@ -131,3 +132,68 @@ df_cluster_stats["distance_moyenne"] = df_cluster_stats["distance_moyenne"].roun
 df_cluster_stats["allure_moyenne"]   = df_cluster_stats["allure_moyenne"].apply(format_pace)
 df_cluster_stats.columns = ["Cluster", "Nb sorties", "Distance moy. (km)", "Allure moy."]
 st.dataframe(df_cluster_stats, use_container_width=True, hide_index=True)
+
+
+st.divider()
+st.subheader("Température vs Allure")
+
+# Convertir start_date_local en datetime
+df["start_date_local"] = pd.to_datetime(df["start_date_local"], utc=True)
+df["is_weekend"] = (df["start_date_local"].dt.weekday >= 5).astype(int)
+df["weather_temperature"] = df["weather_temperature"].fillna(df["weather_temperature"].mean())
+df["jour_type"] = df["is_weekend"].map({0: "Semaine", 1: "Weekend"})
+
+fig_temp = px.scatter(
+    df,
+    x="weather_temperature",
+    y="pace_min_km",
+    color="jour_type",
+    hover_data=["name", "date", "distance_km", "hour"],
+    title="Température vs Allure",
+    labels={
+        "weather_temperature": "Température (°C)",
+        "pace_min_km":         "Allure (min/km)",
+        "jour_type":           "Type de jour"
+    },
+    trendline="ols",
+    color_discrete_sequence=[STRAVA_ORANGE, STRAVA_BLUE]
+)
+fig_temp.update_layout(
+    plot_bgcolor=PLOT_BG,
+    paper_bgcolor=PAPER_BG,
+    font=dict(color="white"),
+    xaxis=dict(gridcolor="#3D3D42"),
+    yaxis=dict(gridcolor="#3D3D42"),
+)
+st.plotly_chart(fig_temp, use_container_width=True)
+
+st.divider()
+st.subheader("Matrice de corrélation")
+
+# Colonnes numériques pertinentes
+corr_cols = ["distance_km", "pace_min_km", "moving_time_seconds",
+             "total_elevation_gain_m", "suffer_score",
+             "weather_temperature", "weather_humidity",
+             "weather_precipitation", "hour", "is_weekend"]
+
+df_corr = df[corr_cols].copy()
+df_corr["weather_humidity"]     = pd.to_numeric(df_corr["weather_humidity"],     errors="coerce")
+df_corr["weather_precipitation"]= pd.to_numeric(df_corr["weather_precipitation"],errors="coerce")
+df_corr["suffer_score"]         = pd.to_numeric(df_corr["suffer_score"],         errors="coerce")
+
+corr_matrix = df_corr.corr()
+
+fig_heatmap = px.imshow(
+    corr_matrix,
+    text_auto=".2f",
+    color_continuous_scale="RdBu_r",
+    zmin=-1, zmax=1,
+    title="Matrice de corrélation",
+    labels={"color": "Corrélation"}
+)
+fig_heatmap.update_layout(
+    plot_bgcolor=PLOT_BG,
+    paper_bgcolor=PAPER_BG,
+    font=dict(color="white"),
+)
+st.plotly_chart(fig_heatmap, use_container_width=True)

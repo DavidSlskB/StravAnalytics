@@ -61,7 +61,8 @@ StravAnalytics/
 ### Moyen terme
 - [ ] Données de flux par activité (splits, PR sur sous-distances)
 - [ ] Amélioration page détail (description, splits via get_activity())
-- [ ] Modèle ML de prédiction du suffer score
+- [ ] Modèle ML de prédiction du suffer score 
+      *(nécessite données de fréquence cardiaque — montre connectée requise)*
 - [ ] Courbes de progression avec projection future
 - [ ] Score de forme sur les 4 dernières semaines basé sur le volume et l'allure
 
