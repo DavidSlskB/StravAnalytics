@@ -54,9 +54,11 @@ StravAnalytics/
 
 ### Court terme
 - [ ] Automatisation du fetch et push des données (scheduler)
-- [ ] Enrichissement météo via API Open-Meteo
+- [x] Enrichissement météo via API Open-Meteo
 - [ ] Visualisations temporelles : répartition par heure, jour, saison
 - [ ] Amélioration clustering : ajout features météo, temporelles
+- [ ] Page Analyse : visualisations temporelles et corrélations
+- [ ] ACP pour explorer les corrélations entre toutes les variables
 
 ### Moyen terme
 - [ ] Données de flux par activité (splits, PR sur sous-distances)
